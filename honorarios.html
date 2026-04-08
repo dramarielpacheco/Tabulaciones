@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mis Honorarios — Dra. Pacheco</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #7C6FF7;
+    --purple-light: #EEF0FF;
+    --purple-dark: #4A3FD4;
+    --teal: #1DB98A;
+    --teal-light: #E0F7EF;
+    --coral: #F06A50;
+    --coral-light: #FFF0ED;
+    --amber: #F5A623;
+    --amber-light: #FFF8EC;
+    --bg: #F7F6FC;
+    --surface: #FFFFFF;
+    --border: #E8E6F4;
+    --text: #1A1730;
+    --text-2: #6B6882;
+    --text-3: #A9A7BE;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 2px 16px rgba(124,111,247,.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* Setup screen */
+  #setup {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 2rem 1rem;
+  }
+  .setup-card {
+    background: var(--surface); border-radius: var(--radius); padding: 2rem;
+    max-width: 420px; width: 100%; box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .setup-card .logo { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--purple); margin-bottom: .25rem; }
+  .setup-card p { font-size: 14px; color: var(--text-2); margin-bottom: 1.5rem; line-height: 1.6; }
+  .setup-card label { font-size: 12px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .6px; display: block; margin-bottom: 6px; }
+  .setup-card input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); margin-bottom: 1rem; outline: none; transition: border .2s; }
+  .setup-card input:focus { border-color: var(--purple); }
+  .btn-setup { width: 100%; padding: 13px; background: var(--purple); color: #fff; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
+  .btn-setup:hover { background: var(--purple-dark); }
+
+  /* Main app */
+  #app { display: none; max-width: 540px; margin: 0 auto; padding: 0 0 6rem; }
+
+  /* Header */
+  .app-header {
+    background: var(--surface); padding: 1.25rem 1.25rem .75rem;
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
+  }
+  .app-header .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+  .app-header .brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--purple); }
+  .app-header .brand span { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text-3); font-weight: 400; display: block; }
+  .month-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--purple-light); border: none; border-radius: 20px;
+    padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+    font-weight: 600; color: var(--purple-dark); cursor: pointer;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 540px;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; z-index: 10;
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 10px 0 12px; background: none; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 600;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: .4px; gap: 4px;
+    transition: color .2s;
+  }
+  .nav-btn svg { width: 22px; height: 22px; }
+  .nav-btn.active { color: var(--purple); }
+  .nav-btn.add-btn {
+    background: var(--purple); color: #fff; border-radius: 0;
+    font-size: 11px;
+  }
+  .nav-btn.add-btn svg path, .nav-btn.add-btn svg line { stroke: #fff; }
+
+  /* Pages */
+  .page { display: none; padding: 1.25rem; }
+  .page.active { display: block; }
+
+  /* Metrics */
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric-card {
+    background: var(--surface); border-radius: var(--radius); padding: 1rem;
+    border: 1px solid var(--border);
+  }
+  .metric-card.wide { grid-column: 1 / -1; }
+  .metric-card .lbl { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .metric-card .val { font-size: 26px; font-weight: 600; font-family: 'DM Serif Display', serif; }
+  .metric-card .sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+  .metric-card.purple .val { color: var(--purple); }
+  .metric-card.teal .val { color: var(--teal); }
+  .metric-card.coral .val { color: var(--coral); }
+
+  /* Progress bar */
+  .progress-wrap { margin-top: 10px; }
+  .progress-bg { background: var(--bg); border-radius: 20px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 8px; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--purple)); transition: width .5s ease; }
+
+  /* Section title */
+  .sec-title { font-size: 13px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; margin: 1.25rem 0 .75rem; }
+
+  /* Alert cards */
+  .alert-card {
+    background: var(--surface); border-radius: var(--radius-sm); padding: .9rem 1rem;
+    border: 1px solid var(--border); margin-bottom: .6rem;
+    display: flex; align-items: center; gap: .75rem;
+  }
+  .alert-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .alert-card .a-name { font-size: 14px; font-weight: 600; }
+  .alert-card .a-issues { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+  .alert-card .a-amount { margin-left: auto; font-size: 14px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
+
+  /* Seguradora bars */
+  .seg-bar { margin-bottom: 1rem; }
+  .seg-bar .row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .seg-bar .name { font-size: 13px; font-weight: 600; }
+  .seg-bar .amounts { font-size: 12px; color: var(--text-2); }
+  .bar-track { background: var(--bg); border-radius: 20px; height: 8px; overflow: hidden; }
+  .bar-inner { height: 8px; border-radius: 20px; transition: width .4s; }
+
+  /* Records list */
+  .record-card {
+    background: var(--surface); border-radius: var(--radius); padding: 1rem 1.1rem;
+    border: 1px solid var(--border); margin-bottom: .75rem;
+  }
+  .record-card .rc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: .6rem; }
+  .record-card .rc-name { font-size: 15px; font-weight: 600; }
+  .record-card .rc-seg { font-size: 12px; }
+  .record-card .rc-amount { text-align: right; }
+  .record-card .rc-neto { font-size: 16px; font-weight: 700; font-family: 'DM Serif Display', serif; }
+  .record-card .rc-bruto { font-size: 11px; color: var(--text-3); }
+  .record-card .rc-checks { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+  .chip.ok { background: var(--teal-light); color: #0a7a54; }
+  .chip.no { background: var(--bg); color: var(--text-3); border: 1px solid var(--border); }
+  .chip.warn { background: var(--amber-light); color: #9a6900; }
+  .record-card .rc-actions { display: flex; gap: 6px; margin-top: .75rem; justify-content: flex-end; }
+  .btn-edit {
+    padding: 5px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
+    background: var(--purple-light); color: var(--purple-dark); border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-del {
+    padding: 5px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
+    background: var(--coral-light); color: var(--coral); border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Form */
+  .form-section { background: var(--surface); border-radius: var(--radius); padding: 1.25rem; border: 1px solid var(--border); margin-bottom: 1rem; }
+  .form-section .fs-title { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 1rem; }
+  .field { margin-bottom: .9rem; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    color: var(--text); background: var(--bg); outline: none; transition: border .2s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--purple); background: #fff; }
+  .field input[readonly] { color: var(--text-2); background: var(--purple-light); border-color: transparent; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .check-item {
+    display: flex; align-items: center; gap: 12px; padding: .8rem 0;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item label { font-size: 14px; font-weight: 500; cursor: pointer; flex: 1; line-height: 1.4; }
+  .check-item .check-desc { font-size: 12px; color: var(--text-3); display: block; }
+  .custom-check {
+    width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: all .15s; background: var(--bg);
+  }
+  .custom-check.checked { background: var(--purple); border-color: var(--purple); }
+  .custom-check svg { display: none; }
+  .custom-check.checked svg { display: block; }
+  .hidden-check { display: none; }
+  #fecha-pago-wrap { overflow: hidden; transition: max-height .3s; max-height: 0; }
+  #fecha-pago-wrap.open { max-height: 100px; }
+  .btn-save {
+    width: 100%; padding: 15px; background: var(--purple); color: #fff;
+    border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
+    font-size: 16px; font-weight: 700; cursor: pointer; transition: background .2s;
+    margin-bottom: .75rem;
+  }
+  .btn-save:hover { background: var(--purple-dark); }
+  .btn-save:disabled { background: var(--text-3); cursor: not-allowed; }
+  .btn-cancel {
+    width: 100%; padding: 13px; background: transparent; color: var(--text-2);
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--text-3); }
+  .empty .e-icon { font-size: 40px; margin-bottom: .75rem; }
+  .empty p { font-size: 14px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: #fff; padding: 10px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; opacity: 0; transition: all .3s; pointer-events: none;
+    white-space: nowrap; z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Month modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(26,23,48,.4); z-index: 50;
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .month-modal {
+    background: var(--surface); border-radius: var(--radius) var(--radius) 0 0;
+    padding: 1.5rem; width: 100%; max-width: 540px; max-height: 70vh; overflow-y: auto;
+  }
+  .month-modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 1rem; }
+  .month-opt {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem .5rem; border-bottom: 1px solid var(--border);
+    cursor: pointer; font-size: 15px; transition: color .15s;
+  }
+  .month-opt:hover { color: var(--purple); }
+  .month-opt.selected { color: var(--purple); font-weight: 700; }
+
+  /* Seg colors */
+  .seg-axa { color: #185FA5; background: #E6F1FB; }
+  .seg-gnp { color: #4A3FD4; background: #EEF0FF; }
+  .seg-bcplus { color: #854F0B; background: #FFF8EC; }
+  .seg-bupa { color: #993556; background: #FBEAF0; }
+  .seg-mapfre { color: #0F6E56; background: #E0F7EF; }
+  .seg-atlas { color: #993C1D; background: #FFF0ED; }
+  .seg-metlife { color: #3B6D11; background: #EAF3DE; }
+  .seg-otro { color: #5F5E5A; background: #F1EFE8; }
+
+  .loading { text-align: center; padding: 2rem; color: var(--text-3); font-size: 14px; }
+  .spinner {
+    display: inline-block; width: 22px; height: 22px; border: 2.5px solid var(--border);
+    border-top-color: var(--purple); border-radius: 50%; animation: spin .7s linear infinite;
+    margin-bottom: .5rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Setup screen -->
+<div id="setup">
+  <div class="setup-card">
+    <div class="logo">Mis Honorarios</div>
+    <p>Para conectar con tu base de Airtable, necesito tu API Token y el Base ID. Solo se guardan en tu dispositivo.</p>
+    <label>API Token de Airtable</label>
+    <input type="password" id="s-token" placeholder="pat..." autocomplete="off">
+    <label>Base ID</label>
+    <input type="text" id="s-baseid" placeholder="appXXXXXXXXXXXXXX" value="appqGxfrZWq5EjlvT">
+    <button class="btn-setup" onclick="saveSetup()">Conectar y entrar</button>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="app">
+  <div class="app-header">
+    <div class="top">
+      <div class="brand">Mis Honorarios <span>Dra. Pacheco</span></div>
+      <button class="month-pill" onclick="openMonthModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="header-month">Cargando...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="page active" id="page-dashboard">
+    <div style="margin-top:1rem">
+      <div class="metrics-grid">
+        <div class="metric-card wide">
+          <div class="lbl">Total esperado este mes</div>
+          <div class="val purple" id="m-total">$0</div>
+          <div class="sub" id="m-sub">0 pacientes registrados</div>
+          <div class="progress-wrap">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-bottom:4px">
+              <span>Cobrado</span><span id="m-pct">0%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" id="m-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="metric-card teal">
+          <div class="lbl">Ya cobrado</div>
+          <div class="val" id="m-pagado">$0</div>
+        </div>
+        <div class="metric-card coral">
+          <div class="lbl">Por cobrar</div>
+          <div class="val" id="m-pendiente">$0</div>
+        </div>
+      </div>
+      <div class="sec-title">Por aseguradora</div>
+      <div id="seg-bars"></div>
+      <div class="sec-title">Pendientes de acción</div>
+      <div id="alerts-list"></div>
+    </div>
+  </div>
+
+  <!-- Registros -->
+  <div class="page" id="page-registros">
+    <div style="margin-top:1rem" id="records-list"></div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="page" id="page-nuevo">
+    <div style="margin-top:1rem">
+      <div class="form-section">
+        <div class="fs-title" id="form-title">Nuevo registro</div>
+        <div class="field">
+          <label>Paciente</label>
+          <input type="text" id="f-pac" placeholder="Nombre completo">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Aseguradora</label>
+            <select id="f-seg">
+              <option value="AXA">AXA</option>
+              <option value="GNP">GNP</option>
+              <option value="Blue Cross Plus">Blue Cross Plus</option>
+              <option value="Bupa México">Bupa México</option>
+              <option value="MAPFRE">MAPFRE</option>
+              <option value="Atlas">Atlas</option>
+              <option value="MetLife">MetLife</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Mes</label>
+            <input type="month" id="f-mes">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Cantidad bruta</label>
+            <input type="number" id="f-cant" placeholder="0.00" min="0" oninput="calcNeto()">
+          </div>
+          <div class="field">
+            <label>Neto (−10%)</label>
+            <input type="text" id="f-neto" readonly placeholder="Automático">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fs-title">Estado del trámite</div>
+        <div class="check-item" onclick="toggleCheck('f-tramite')">
+          <div class="custom-check" id="cc-f-tramite">
+            <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <input type="checkbox" id="f-tramite" class="hidden-check">
+          <label for="f-tramite">
+            Trámite ingresado
+            <span class="check-desc">El expediente ya fue enviado a la aseguradora</span>
+          </label>
+        </div>
+        <div class="check-item" onclick="toggleCheck('f-tabul')">
+          <div class="custom-check" id="cc-f-tabul">
+            <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <input type="checkbox" id="f-tabul" class="hidden-check">
+          <label for="f-tabul">
+            Tabulación recogida
+            <span class="check-desc">Ya tienes el comprobante de tabulación</span>
+          </label>
+        </div>
+        <div class="check-item" onclick="toggleCheck('f-pago')">
+          <div class="custom-check" id="cc-f-pago">
+            <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <input type="checkbox" id="f-pago" class="hidden-check" onchange="toggleFechaPago()">
+          <label for="f-pago">
+            Pago recibido en cuenta
+            <span class="check-desc">El dinero ya llegó a tu cuenta bancaria</span>
+          </label>
+        </div>
+        <div id="fecha-pago-wrap">
+          <div class="field" style="margin-top:.75rem">
+            <label>Fecha de pago</label>
+            <input type="date" id="f-fpago">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-save" id="btn-guardar" onclick="guardar()">Guardar registro</button>
+      <button class="btn-cancel" onclick="cancelar()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-dashboard" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Resumen
+    </button>
+    <button class="nav-btn add-btn" id="nav-nuevo" onclick="showPage('nuevo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Agregar
+    </button>
+    <button class="nav-btn" id="nav-registros" onclick="showPage('registros')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
+      Registros
+    </button>
+  </nav>
+</div>
+
+<!-- Month modal -->
+<div class="modal-overlay" id="month-modal" onclick="closeMonthModal(event)">
+  <div class="month-modal">
+    <h3>Seleccionar mes</h3>
+    <div id="month-options"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BASE_ID = 'appqGxfrZWq5EjlvT';
+const TABLE = 'Tabulaciones';
+const RETENCION = 0.10;
+
+let token = '';
+let records = [];
+let editId = null;
+let currentMonth = '';
+
+function getToken(){ return localStorage.getItem('at_token') || ''; }
+function getBaseId(){ return localStorage.getItem('at_baseid') || BASE_ID; }
+
+function saveSetup(){
+  const t = document.getElementById('s-token').value.trim();
+  const b = document.getElementById('s-baseid').value.trim();
+  if(!t){ showToast('Ingresa tu API Token'); return; }
+  if(!b){ showToast('Ingresa el Base ID'); return; }
+  localStorage.setItem('at_token', t);
+  localStorage.setItem('at_baseid', b);
+  initApp();
+}
+
+function initApp(){
+  token = getToken();
+  if(!token){ document.getElementById('setup').style.display='flex'; return; }
+  document.getElementById('setup').style.display='none';
+  document.getElementById('app').style.display='block';
+  const now = new Date();
+  currentMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  updateHeaderMonth();
+  loadRecords();
+}
+
+function updateHeaderMonth(){
+  const [y,m] = currentMonth.split('-');
+  const label = new Date(y, m-1, 1).toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+  document.getElementById('header-month').textContent = label.charAt(0).toUpperCase()+label.slice(1);
+}
+
+async function loadRecords(){
+  const token = getToken();
+  const baseId = getBaseId();
+  try {
+    let all = [], offset = '';
+    do {
+      const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(TABLE)}?pageSize=100${offset?'&offset='+offset:''}`;
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` }});
+      const data = await res.json();
+      if(data.error){ showToast('Error: ' + data.error.message); return; }
+      all = all.concat(data.records || []);
+      offset = data.offset || '';
+    } while(offset);
+    records = all.map(r => ({
+      id: r.id,
+      pac: r.fields.Paciente || '',
+      seg: r.fields.Aseguradora || '',
+      mes: r.fields.Mes ? r.fields.Mes.substring(0,7) : '',
+      cant: r.fields.Cantidad || 0,
+      neto: r.fields.Neto || 0,
+      tramite: r.fields.Tramite || false,
+      tabul: r.fields.Tabulacion || false,
+      pago: r.fields.Pago || false,
+      fpago: r.fields.FechaPago || ''
+    }));
+    renderAll();
+  } catch(e){ showToast('Error de conexión'); }
+}
+
+async function saveRecord(fields, id){
+  const token = getToken();
+  const baseId = getBaseId();
+  const url = id
+    ? `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(TABLE)}/${id}`
+    : `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(TABLE)}`;
+  const method = id ? 'PATCH' : 'POST';
+  const res = await fetch(url, {
+    method,
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields })
+  });
+  return await res.json();
+}
+
+async function deleteRecord(id){
+  const token = getToken();
+  const baseId = getBaseId();
+  await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(TABLE)}/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
+function fmtMXN(n){ return '$' + Math.round(n).toLocaleString('es-MX'); }
+
+function segClass(s){
+  const m = { 'AXA':'seg-axa','GNP':'seg-gnp','Blue Cross Plus':'seg-bcplus','Bupa México':'seg-bupa','MAPFRE':'seg-mapfre','Atlas':'seg-atlas','MetLife':'seg-metlife' };
+  return m[s] || 'seg-otro';
+}
+
+function segColors(s){
+  const m = { 'AXA':'#378ADD','GNP':'#7C6FF7','Blue Cross Plus':'#F5A623','Bupa México':'#D4537E','MAPFRE':'#1DB98A','Atlas':'#F06A50','MetLife':'#639922','Otra':'#888' };
+  return m[s] || '#888';
+}
+
+function filteredRecords(){
+  return records.filter(r => r.mes === currentMonth);
+}
+
+function renderAll(){ renderDashboard(); renderRecords(); }
+
+function renderDashboard(){
+  const recs = filteredRecords();
+  const total = recs.reduce((a,r)=>a+r.neto,0);
+  const pagado = recs.filter(r=>r.pago).reduce((a,r)=>a+r.neto,0);
+  const pendiente = total - pagado;
+  const pct = total > 0 ? Math.round(pagado/total*100) : 0;
+
+  document.getElementById('m-total').textContent = fmtMXN(total);
+  document.getElementById('m-pagado').textContent = fmtMXN(pagado);
+  document.getElementById('m-pendiente').textContent = fmtMXN(pendiente);
+  document.getElementById('m-sub').textContent = `${recs.length} paciente${recs.length!==1?'s':''} registrado${recs.length!==1?'s':''}`;
+  document.getElementById('m-pct').textContent = pct + '%';
+  document.getElementById('m-bar').style.width = pct + '%';
+
+  // Seg bars
+  const segs = {};
+  recs.forEach(r=>{ segs[r.seg]=segs[r.seg]||{t:0,p:0}; segs[r.seg].t+=r.neto; if(r.pago)segs[r.seg].p+=r.neto; });
+  const maxT = Math.max(...Object.values(segs).map(s=>s.t), 1);
+  let html = '';
+  Object.entries(segs).sort((a,b)=>b[1].t-a[1].t).forEach(([seg,{t,p}])=>{
+    const pct2 = Math.round(t/maxT*100);
+    html += `<div class="seg-bar">
+      <div class="row">
+        <span class="name"><span class="chip ${segClass(seg)}" style="margin-right:4px">${seg}</span></span>
+        <span class="amounts">${fmtMXN(p)} / ${fmtMXN(t)}</span>
+      </div>
+      <div class="bar-track"><div class="bar-inner" style="width:${pct2}%;background:${segColors(seg)}"></div></div>
+    </div>`;
+  });
+  document.getElementById('seg-bars').innerHTML = html || '<div style="font-size:13px;color:var(--text-3);padding:.5rem 0">Sin registros este mes</div>';
+
+  // Alerts
+  const alerts = recs.filter(r=>!r.tramite||!r.tabul||(r.tramite&&!r.pago));
+  let ahtml = '';
+  if(!alerts.length){
+    ahtml = '<div style="font-size:14px;color:var(--teal);font-weight:600;padding:.75rem 0">✓ Todo al día este mes</div>';
+  } else {
+    alerts.forEach(r=>{
+      const issues=[];
+      if(!r.tramite) issues.push('ingresar trámite');
+      if(!r.tabul) issues.push('recoger tabulación');
+      if(r.tramite&&!r.pago) issues.push('pago pendiente');
+      const color = !r.tramite ? 'var(--coral)' : 'var(--amber)';
+      ahtml += `<div class="alert-card">
+        <div class="alert-dot" style="background:${color}"></div>
+        <div>
+          <div class="a-name">${r.pac}</div>
+          <div class="a-issues">${issues.join(' · ')}</div>
+        </div>
+        <div class="a-amount">${fmtMXN(r.neto)}</div>
+      </div>`;
+    });
+  }
+  document.getElementById('alerts-list').innerHTML = ahtml;
+}
+
+function renderRecords(){
+  const recs = filteredRecords();
+  const el = document.getElementById('records-list');
+  if(!recs.length){
+    el.innerHTML = `<div class="empty"><div class="e-icon">📋</div><p>Sin registros para este mes.<br>Presiona + para agregar.</p></div>`;
+    return;
+  }
+  el.innerHTML = recs.map(r=>{
+    const pagoChip = r.pago
+      ? `<span class="chip ok">✓ Pagado${r.fpago?' · '+r.fpago:''}</span>`
+      : r.tramite ? `<span class="chip warn">Esperando pago</span>` : `<span class="chip no">Sin trámite</span>`;
+    return `<div class="record-card">
+      <div class="rc-top">
+        <div>
+          <div class="rc-name">${r.pac}</div>
+          <span class="chip ${segClass(r.seg)}" style="margin-top:4px;display:inline-flex">${r.seg}</span>
+        </div>
+        <div class="rc-amount">
+          <div class="rc-neto">${fmtMXN(r.neto)}</div>
+          <div class="rc-bruto">Bruto: ${fmtMXN(r.cant)}</div>
+        </div>
+      </div>
+      <div class="rc-checks">
+        <span class="chip ${r.tramite?'ok':'no'}">${r.tramite?'✓ Trámite':'Sin trámite'}</span>
+        <span class="chip ${r.tabul?'ok':'no'}">${r.tabul?'✓ Tabulación':'Falta tabul.'}</span>
+        ${pagoChip}
+      </div>
+      <div class="rc-actions">
+        <button class="btn-edit" onclick="editRecord('${r.id}')">Editar</button>
+        <button class="btn-del" onclick="confirmDelete('${r.id}')">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function calcNeto(){
+  const v = parseFloat(document.getElementById('f-cant').value)||0;
+  document.getElementById('f-neto').value = v ? fmtMXN(v*(1-RETENCION)) : '';
+}
+
+function toggleCheck(id){
+  const cb = document.getElementById(id);
+  cb.checked = !cb.checked;
+  document.getElementById('cc-'+id).classList.toggle('checked', cb.checked);
+  if(id==='f-pago') toggleFechaPago();
+}
+
+function toggleFechaPago(){
+  const checked = document.getElementById('f-pago').checked;
+  document.getElementById('fecha-pago-wrap').classList.toggle('open', checked);
+}
+
+function resetForm(){
+  document.getElementById('f-pac').value='';
+  document.getElementById('f-cant').value='';
+  document.getElementById('f-neto').value='';
+  document.getElementById('f-seg').value='AXA';
+  document.getElementById('f-mes').value=currentMonth;
+  document.getElementById('f-fpago').value='';
+  ['f-tramite','f-tabul','f-pago'].forEach(id=>{
+    document.getElementById(id).checked=false;
+    document.getElementById('cc-'+id).classList.remove('checked');
+  });
+  document.getElementById('fecha-pago-wrap').classList.remove('open');
+  document.getElementById('form-title').textContent='Nuevo registro';
+  document.getElementById('btn-guardar').textContent='Guardar registro';
+  editId=null;
+}
+
+async function guardar(){
+  const pac = document.getElementById('f-pac').value.trim();
+  const cant = parseFloat(document.getElementById('f-cant').value);
+  if(!pac){ showToast('Ingresa el nombre del paciente'); return; }
+  if(!cant||cant<=0){ showToast('Ingresa una cantidad válida'); return; }
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled=true; btn.textContent='Guardando...';
+  const mesVal = document.getElementById('f-mes').value;
+  const fields = {
+    Paciente: pac,
+    Aseguradora: document.getElementById('f-seg').value,
+    Mes: mesVal + '-01',
+    Cantidad: cant,
+    Neto: Math.round(cant*(1-RETENCION)*100)/100,
+    Tramite: document.getElementById('f-tramite').checked,
+    Tabulacion: document.getElementById('f-tabul').checked,
+    Pago: document.getElementById('f-pago').checked,
+    FechaPago: document.getElementById('f-fpago').value || undefined
+  };
+  if(!fields.FechaPago) delete fields.FechaPago;
+  const result = await saveRecord(fields, editId);
+  if(result.error){ showToast('Error: '+result.error.message); btn.disabled=false; btn.textContent='Guardar registro'; return; }
+  showToast(editId ? 'Registro actualizado' : 'Registro guardado');
+  resetForm();
+  await loadRecords();
+  showPage('dashboard');
+  btn.disabled=false; btn.textContent='Guardar registro';
+}
+
+function editRecord(id){
+  const r = records.find(x=>x.id===id);
+  if(!r) return;
+  editId = id;
+  document.getElementById('f-pac').value = r.pac;
+  document.getElementById('f-seg').value = r.seg;
+  document.getElementById('f-mes').value = r.mes;
+  document.getElementById('f-cant').value = r.cant;
+  document.getElementById('f-neto').value = fmtMXN(r.neto);
+  ['f-tramite','f-tabul','f-pago'].forEach(fid=>{
+    const v = fid==='f-tramite'?r.tramite:fid==='f-tabul'?r.tabul:r.pago;
+    document.getElementById(fid).checked=v;
+    document.getElementById('cc-'+fid).classList.toggle('checked',v);
+  });
+  document.getElementById('f-fpago').value = r.fpago||'';
+  document.getElementById('fecha-pago-wrap').classList.toggle('open', r.pago);
+  document.getElementById('form-title').textContent='Editar registro';
+  document.getElementById('btn-guardar').textContent='Actualizar registro';
+  showPage('nuevo');
+}
+
+async function confirmDelete(id){
+  if(!confirm('¿Eliminar este registro?')) return;
+  await deleteRecord(id);
+  showToast('Registro eliminado');
+  await loadRecords();
+}
+
+function cancelar(){ resetForm(); showPage('dashboard'); }
+
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='nuevo'){ document.getElementById('f-mes').value=currentMonth; }
+}
+
+function allMonths(){
+  const set = new Set(records.map(r=>r.mes).filter(Boolean));
+  const now = new Date();
+  for(let i=0;i<6;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    set.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  return [...set].sort().reverse();
+}
+
+function openMonthModal(){
+  const months = allMonths();
+  let html='';
+  months.forEach(m=>{
+    const [y,mo]=m.split('-');
+    const label=new Date(y,mo-1,1).toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+    html+=`<div class="month-opt${m===currentMonth?' selected':''}" onclick="selectMonth('${m}')">
+      ${label.charAt(0).toUpperCase()+label.slice(1)}
+      ${m===currentMonth?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':''}
+    </div>`;
+  });
+  document.getElementById('month-options').innerHTML=html;
+  document.getElementById('month-modal').classList.add('open');
+}
+
+function selectMonth(m){ currentMonth=m; updateHeaderMonth(); renderAll(); closeMonthModal(); }
+function closeMonthModal(e){ if(!e||e.target===document.getElementById('month-modal')) document.getElementById('month-modal').classList.remove('open'); }
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// Init
+initApp();
+</script>
+</body>
+</html>
